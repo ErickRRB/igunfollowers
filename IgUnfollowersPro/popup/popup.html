@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Unfollowers Pro</title>
+    <style>
+        body {
+            width: 300px;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 16px;
+            text-align: center;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Instagram Unfollowers Pro</h1>
+    <p>Descubre quién no te sigue de vuelta en Instagram</p>
+    <button id="openInstagram">Ir a Instagram</button>
+
+    <script>
+        // Script mínimo
+        document.getElementById('openInstagram').addEventListener('click', function() {
+            chrome.tabs.create({ url: 'https://www.instagram.com/' });
+        });
+    </script>
+</body>
+</html>
