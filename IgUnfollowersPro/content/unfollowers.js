@@ -640,7 +640,7 @@ function renderResults(users) {
         const isNewUnfollower = isNewNonFollower(user.id);
         const lastSeenDate = getLastSeenDate(user.id);
         
-        // Create user element
+        // Create user element - QUITAR onchange y añadir data-user-id
         const verifiedIcon = user.is_verified ? `
             <div style="background-color:#49adf4; border-radius:50%; padding:0.2rem 0.3rem; font-size:0.35em; height:fit-content;">✔</div>` : "";
 
@@ -655,6 +655,7 @@ function renderResults(users) {
         const lastSeenInfo = lastSeenDate ? 
             `<div style="font-size:0.7em; color:#888;">${UI_TEXTS.FOLLOWER_SINCE} ${lastSeenDate}</div>` : "";
 
+        // IMPORTANTE: Quitar el onchange y agregar data-user-id
         resultsContainer.innerHTML += `
             <label style="display:flex; align-items:center; padding:1rem; border-radius:3px; cursor:pointer; ${newUnfollowerStyle}">
                 <div style="display:flex; align-items:center; flex:1;">
@@ -667,7 +668,7 @@ function renderResults(users) {
                     ${verifiedIcon}
                     ${privacyStatus}
                 </div>
-                <input class="iu_account-checkbox" type="checkbox" data-user-id="${user.id}" style="height:1.1rem; width:1.1rem;" onchange="toggleUser(${user.id})" />
+                <input class="iu_account-checkbox" type="checkbox" data-user-id="${user.id}" style="height:1.1rem; width:1.1rem;" />
             </label>`;
     });
     
@@ -683,6 +684,18 @@ function renderResults(users) {
             showUpgradeModal('maxUnfollowers');
         });
     }
+
+    addCheckboxEventListeners();
+}
+
+function addCheckboxEventListeners() {
+    // Agregar event listeners a todos los checkboxes
+    document.querySelectorAll('.iu_account-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const userId = this.getAttribute('data-user-id');
+            toggleUser(userId);
+        });
+    });
 }
 
 async function run(includeVerified) {
@@ -1047,7 +1060,7 @@ function showHistoryOverlay() {
         });
         
         document.querySelector(".iu_clear-history-btn").addEventListener("click", clearHistoryExceptLatest);
-        
+
         // Handle export buttons
         if (isTrialActive || checkFeatureAccess('export')) {
             document.querySelector(".iu_export-csv")?.addEventListener("click", () => {
