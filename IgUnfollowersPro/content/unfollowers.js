@@ -562,12 +562,33 @@ function getUserById(userId) {
 }
 
 function copyListToClipboard() {
-    const sortedList = [...nonFollowersList].sort((a, b) => a.username.localeCompare(b.username));
-    let textToCopy = "";
-    sortedList.forEach(user => {
-        textToCopy += user.username + "\n";
-    });
-    copyToClipboard(textToCopy);
+    try {
+        if (!nonFollowersList || nonFollowersList.length === 0) {
+            alert("No hay unfollowers para copiar");
+            return;
+        }
+
+        const sortedList = [...nonFollowersList].sort((a, b) => a.username.localeCompare(b.username));
+        let textToCopy = "";
+        
+        sortedList.forEach(user => {
+            textToCopy += user.username + "\n";
+        });
+        
+        // Intento directo de copia usando navigator.clipboard
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                alert(UI_TEXTS.COPY_SUCCESS);
+            })
+            .catch((err) => {
+                console.error("Error al copiar directamente:", err);
+                // Método alternativo: creamos un elemento textarea temporal
+                fallbackCopyToClipboard(textToCopy);
+            });
+    } catch (error) {
+        console.error("Error en copyListToClipboard:", error);
+        alert("Error al copiar la lista. Por favor intenta de nuevo.");
+    }
 }
 
 async function copyToClipboard(text) {
@@ -947,7 +968,13 @@ function showHistoryOverlay() {
             <h2 style="text-align:center; margin-bottom:20px; color:white;">${UI_TEXTS.HISTORY_TITLE}</h2>
             <button class="iu_close-history" style="position:absolute; top:10px; right:10px; font-size:20px; color:white; background:none; border:none; cursor:pointer;">✖</button>
         `;
-        
+
+        historyHTML += `
+            <div style="text-align:center; margin-bottom:20px;">
+                <button class="iu_clear-history-btn" style="background-color:#dc3545; color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer; margin:0 5px;">Borrar historial (excepto último)</button>
+            </div>
+        `;
+
         // Añadir controles de exportación (solo para planes premium/pro)
         if (isTrialActive || checkFeatureAccess('export')) {
             historyHTML += `
@@ -1018,6 +1045,8 @@ function showHistoryOverlay() {
         document.querySelector(".iu_close-history").addEventListener("click", () => {
             historyOverlay.remove();
         });
+        
+        document.querySelector(".iu_clear-history-btn").addEventListener("click", clearHistoryExceptLatest);
         
         // Handle export buttons
         if (isTrialActive || checkFeatureAccess('export')) {
@@ -1219,6 +1248,77 @@ window.unfollow = async () => {
     resultsContainer.innerHTML += `<hr /><div style='padding:1rem;font-size:1.25em;color:#56d756;'>${UI_TEXTS.ALL_DONE}</div><hr />`;
     scrollToBottom();
 };
+
+function fallbackCopyToClipboard(text) {
+    try {
+        // Crear un campo de texto temporal
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        
+        // Configurar el campo para que no sea visible
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        
+        // Seleccionar y copiar el texto
+        textArea.focus();
+        textArea.select();
+        
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (successful) {
+            alert(UI_TEXTS.COPY_SUCCESS);
+        } else {
+            alert("No se pudo copiar la lista. Por favor intenta manualmente: selecciona los nombres y usa CTRL+C");
+        }
+    } catch (err) {
+        console.error('Error en fallbackCopyToClipboard:', err);
+        alert("Error al copiar la lista. Por favor intenta de nuevo.");
+    }
+}
+
+/**
+ * Borra todo el historial excepto la entrada más reciente
+ */
+function clearHistoryExceptLatest() {
+    try {
+        const historyJson = localStorage.getItem(STORAGE_KEY);
+        if (!historyJson) {
+            alert("No hay historial para borrar");
+            return;
+        }
+        
+        const history = JSON.parse(historyJson);
+        if (history.length <= 1) {
+            alert("Solo hay una entrada en el historial. No hay nada que borrar.");
+            return;
+        }
+        
+        // Guardar solo la entrada más reciente
+        const latestEntry = history[history.length - 1];
+        
+        // Crear nuevo array solo con la última entrada
+        const newHistory = [latestEntry];
+        
+        // Guardar el nuevo historial
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+        
+        alert("Historial borrado correctamente. Se ha conservado solo la entrada más reciente.");
+        
+        // Si el overlay de historial está abierto, actualizarlo
+        const historyOverlay = document.querySelector('.iu_history-overlay');
+        if (historyOverlay) {
+            historyOverlay.remove();
+            showHistoryOverlay(); // Volver a mostrar con el historial actualizado
+        }
+        
+    } catch (error) {
+        console.error("Error borrando historial:", error);
+        alert("Error al borrar el historial. Por favor intenta de nuevo.");
+    }
+}
 
 // Initialize
 init();

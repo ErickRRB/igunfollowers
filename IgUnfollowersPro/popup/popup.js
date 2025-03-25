@@ -32,24 +32,32 @@ document.addEventListener('DOMContentLoaded', async function() {
     contactLink.addEventListener('click', openContact);
     
     // Obtener la pestaña activa
-    let [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    // Verificar si estamos en Instagram
-    if (activeTab.url.includes('instagram.com')) {
-        // Estamos en Instagram, verificar si ya está ejecutándose o si el usuario está logueado
-        checkInstagramStatus(activeTab.id);
-    } else {
-        // No estamos en Instagram
-        notInstagramCard.style.display = 'block';
-        onInstagramCard.style.display = 'none';
-        needsLoginCard.style.display = 'none';
-        alreadyRunningCard.style.display = 'none';
+    try {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        let activeTab = tabs && tabs.length > 0 ? tabs[0] : null;
+        
+        if (activeTab && activeTab.url && activeTab.url.includes('instagram.com')) {
+            // Estamos en Instagram, verificar si ya está ejecutándose o si el usuario está logueado
+            checkInstagramStatus(activeTab.id);
+        } else {
+            // No estamos en Instagram
+            showNotInstagramCard();
+        }
+    } catch (error) {
+        console.error("Error obteniendo la pestaña activa:", error);
+        showNotInstagramCard();
     }
     
     // Cargar datos de suscripción
     loadSubscriptionData();
     
     // Funciones
+    function showNotInstagramCard() {
+        notInstagramCard.style.display = 'block';
+        onInstagramCard.style.display = 'none';
+        needsLoginCard.style.display = 'none';
+        alreadyRunningCard.style.display = 'none';
+    }
     
     function openInstagram() {
         chrome.tabs.create({ url: 'https://www.instagram.com/' });
@@ -57,18 +65,41 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     
     async function startAnalysis() {
-        // Mensaje a la pestaña para ejecutar el análisis
-        chrome.tabs.sendMessage(activeTab.id, { action: 'runAnalysis' });
-        window.close();
+        try {
+            const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tabs && tabs.length > 0) {
+                // Mensaje a la pestaña para ejecutar el análisis
+                chrome.tabs.sendMessage(tabs[0].id, { action: 'runAnalysis' })
+                    .catch(error => console.log("Error enviando mensaje, podría ser normal si content script no está cargado:", error));
+                window.close();
+            }
+        } catch (error) {
+            console.error("Error iniciando análisis:", error);
+        }
     }
     
     function refreshPage() {
-        chrome.tabs.reload(activeTab.id);
+        try {
+            const tabs = chrome.tabs.query({ active: true, currentWindow: true });
+            if (tabs && tabs.length > 0) {
+                chrome.tabs.reload(tabs[0].id);
+            }
+        } catch (error) {
+            console.error("Error recargando página:", error);
+        }
         window.close();
     }
     
     function showUpgradeOptions() {
-        chrome.tabs.sendMessage(activeTab.id, { action: 'showUpgrade' });
+        try {
+            const tabs = chrome.tabs.query({ active: true, currentWindow: true });
+            if (tabs && tabs.length > 0) {
+                chrome.tabs.sendMessage(tabs[0].id, { action: 'showUpgrade' })
+                    .catch(error => console.log("Error enviando mensaje, podría ser normal si content script no está cargado:", error));
+            }
+        } catch (error) {
+            console.error("Error mostrando opciones de actualización:", error);
+        }
         window.close();
     }
     
@@ -89,13 +120,13 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Verificar estado en Instagram (si está ejecutándose o si necesita login)
             const response = await chrome.tabs.sendMessage(tabId, { action: 'checkStatus' });
             
-            if (response.isRunning) {
+            if (response && response.isRunning) {
                 // Ya está ejecutándose
                 notInstagramCard.style.display = 'none';
                 onInstagramCard.style.display = 'none';
                 needsLoginCard.style.display = 'none';
                 alreadyRunningCard.style.display = 'block';
-            } else if (response.isLoggedIn) {
+            } else if (response && response.isLoggedIn) {
                 // Usuario logueado, mostrar opción para iniciar
                 notInstagramCard.style.display = 'none';
                 onInstagramCard.style.display = 'block';
@@ -109,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 alreadyRunningCard.style.display = 'none';
             }
         } catch (error) {
-            console.error("Error checking Instagram status:", error);
+            console.log("Error comprobando estado, posiblemente content script no inicializado:", error);
             // La extensión probablemente no está inicializada en la página
             notInstagramCard.style.display = 'none';
             onInstagramCard.style.display = 'block';
