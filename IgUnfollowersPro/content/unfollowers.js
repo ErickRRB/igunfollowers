@@ -53,7 +53,7 @@ const USER_CSRFTOKEN = getCookie("csrftoken");
 const UI_TEXTS = {
     // Título y botones principales
     TITLE: "Instagram Unfollowers Pro",
-    RUN_BUTTON: "Analizar seguidores",
+    RUN_BUTTON: "RUN",
     COPY_LIST_BUTTON: "Copiar lista",
     COPY_SUCCESS: "¡Lista copiada al portapapeles!",
     INCLUDE_VERIFIED: "Incluir verificados",
@@ -430,7 +430,7 @@ function showTutorial() {
         },
         {
             title: "Análisis de seguidores",
-            content: "Haz clic en el botón 'Analizar seguidores' para comenzar a escanear tu cuenta. El proceso puede tomar unos minutos dependiendo del número de seguidores.",
+            content: "Haz clic en el botón 'RUN' para comenzar a escanear tu cuenta. El proceso puede tomar unos minutos dependiendo del número de seguidores.",
             image: "tutorial-analyze.png"
         },
         {
