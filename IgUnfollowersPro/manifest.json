@@ -1,40 +1,48 @@
 {
-    "manifest_version": 3,
-    "name": "Instagram Unfollowers Pro",
-    "version": "1.0.0",
-    "description": "Descubre quién no te sigue de vuelta en Instagram",
-    "icons": {
+  "manifest_version": 3,
+  "name": "Instagram Unfollowers Pro",
+  "version": "1.0.0",
+  "description": "Descubre quién no te sigue de vuelta en Instagram y gestiona tus seguidores eficientemente",
+  "icons": {
+    "16": "assets/images/icon16.png",
+    "48": "assets/images/icon48.png",
+    "128": "assets/images/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
       "16": "assets/images/icon16.png",
       "48": "assets/images/icon48.png",
       "128": "assets/images/icon128.png"
-    },
-    "action": {
-      "default_popup": "popup/popup.html",
-      "default_icon": {
-        "16": "assets/images/icon16.png",
-        "48": "assets/images/icon48.png",
-        "128": "assets/images/icon128.png"
-      }
-    },
-    "permissions": [
-      "storage"
-    ],
-    "host_permissions": [
-      "*://*.instagram.com/*"
-    ],
-    "background": {
-      "service_worker": "background/background.js"
-    },
-    "content_scripts": [
-      {
-        "matches": ["*://*.instagram.com/*"],
-        "js": ["content/content.js"]
-      }
-    ],
-    "web_accessible_resources": [
-      {
-        "resources": ["content/unfollowers.js"],
-        "matches": ["*://*.instagram.com/*"]
-      }
-    ]
-  }
+    }
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "*://*.instagram.com/*"
+  ],
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.instagram.com/*"],
+      "js": ["content/content.js"],
+      "css": ["content/styles.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/unfollowers.js",
+        "lib/subscription.js",
+        "lib/storage.js",
+        "assets/images/*"
+      ],
+      "matches": ["*://*.instagram.com/*"]
+    }
+  ]
+}

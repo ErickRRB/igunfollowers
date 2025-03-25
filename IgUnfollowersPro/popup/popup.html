@@ -4,39 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instagram Unfollowers Pro</title>
-    <style>
-        body {
-            width: 300px;
-            padding: 10px;
-            font-family: Arial, sans-serif;
-        }
-        h1 {
-            font-size: 16px;
-            text-align: center;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            background-color: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <h1>Instagram Unfollowers Pro</h1>
-    <p>Descubre quién no te sigue de vuelta en Instagram</p>
-    <button id="openInstagram">Ir a Instagram</button>
+    <header>
+        <div class="logo">
+            <img src="../assets/images/icon48.png" alt="Logo">
+            <h1>Instagram Unfollowers Pro</h1>
+        </div>
+        <div class="subscription-badge" id="subscriptionBadge"></div>
+    </header>
 
-    <script>
-        // Script mínimo
-        document.getElementById('openInstagram').addEventListener('click', function() {
-            chrome.tabs.create({ url: 'https://www.instagram.com/' });
-        });
-    </script>
+    <main>
+        <div id="not-instagram" class="card">
+            <div class="icon-container">
+                <img src="../assets/images/instagram.png" alt="Instagram">
+            </div>
+            <h2>No estás en Instagram</h2>
+            <p>Navega a Instagram.com para usar la herramienta.</p>
+            <button id="goToInstagram" class="primary-button">Ir a Instagram</button>
+        </div>
+
+        <div id="on-instagram" class="card" style="display: none;">
+            <h2>¡Estás en Instagram!</h2>
+            <p>Haz clic en el botón para descubrir quién no te sigue de vuelta.</p>
+            <button id="runAnalysis" class="primary-button">Analizar seguidores</button>
+        </div>
+
+        <div id="needs-login" class="card" style="display: none;">
+            <div class="icon-container warning">
+                <img src="../assets/images/warning.png" alt="Advertencia">
+            </div>
+            <h2>Necesitas iniciar sesión</h2>
+            <p>Inicia sesión en Instagram para usar esta herramienta.</p>
+            <button id="refreshPage" class="primary-button">Actualizar página</button>
+        </div>
+
+        <div id="already-running" class="card" style="display: none;">
+            <div class="icon-container">
+                <img src="../assets/images/loading.gif" alt="Cargando">
+            </div>
+            <h2>Análisis en curso</h2>
+            <p>La herramienta está analizando tus seguidores. Por favor, regresa a la pestaña de Instagram.</p>
+        </div>
+    </main>
+
+    <div class="info-box trial" id="trialInfo" style="display: none;">
+        <strong>Período de prueba activo:</strong> 
+        <span id="trialDaysLeft">7</span> días restantes
+    </div>
+
+    <div class="info-box free" id="freeInfo" style="display: none;">
+        <strong>Plan gratuito:</strong> Limitado a 100 unfollowers
+        <button id="upgradePlan" class="upgrade-button">Actualizar</button>
+    </div>
+
+    <div class="info-box premium" id="premiumInfo" style="display: none;">
+        <strong>Plan Premium:</strong> Disfruta de todas las ventajas premium
+    </div>
+
+    <div class="info-box pro" id="proInfo" style="display: none;">
+        <strong>Plan Pro:</strong> Disfruta de todas las ventajas exclusivas
+    </div>
+
+    <div class="info-section">
+        <div class="info-item">
+            <h3>Novedades</h3>
+            <ul>
+                <li>Ahora también detecta nuevos unfollowers desde la última revisión</li>
+                <li>Historial mejorado de unfollowers</li>
+                <li>Exportación de datos en diversos formatos (Premium)</li>
+            </ul>
+        </div>
+        <div class="info-item">
+            <h3>Soporte</h3>
+            <p>¿Necesitas ayuda?</p>
+            <a href="mailto:eriickramiirez@gmail.com" class="support-link">eriickramiirez@gmail.com</a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 Instagram Unfollowers Pro</p>
+        <div class="footer-links">
+            <a href="#" id="privacyLink">Privacidad</a>
+            <a href="#" id="termsLink">Términos</a>
+            <a href="#" id="contactLink">Contacto</a>
+        </div>
+    </footer>
+
+    <script src="popup.js"></script>
 </body>
 </html>
